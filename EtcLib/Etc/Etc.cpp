@@ -19,6 +19,7 @@
 #include "EtcFilter.h"
 
 #include <string.h>
+#include <algorithm>
 
 namespace Etc
 {
@@ -70,7 +71,7 @@ namespace Etc
 		auto mipWidth = a_uiSourceWidth;
 		auto mipHeight = a_uiSourceHeight;
 		int totalEncodingTime = 0;
-		for(unsigned int mip = 0; mip < a_uiMaxMipmaps && mipWidth >= 1 && mipHeight >= 1; mip++)
+		for(unsigned int mip = 0; mip < a_uiMaxMipmaps; mip++)
 		{
 			float* pImageData = nullptr;
 			float* pMipImage = nullptr;
@@ -114,8 +115,13 @@ namespace Etc
 				break;
 			}
 
-			mipWidth >>= 1;
-			mipHeight >>= 1;
+			if (mipWidth == 1 && mipHeight == 1)
+			{
+				break;
+			}
+
+			mipWidth = std::max(mipWidth >> 1, 1u);
+			mipHeight = std::max(mipHeight >> 1, 1u);
 		}
 
 		*a_piEncodingTime_ms = totalEncodingTime;
